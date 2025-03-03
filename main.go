@@ -6,7 +6,6 @@ import (
 	"net/http"
 )
 
-var counter int
 var task string
 
 type TaskRequest struct {
@@ -30,8 +29,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 
 		}
 		task = req.Task
-		counter++
-		fmt.Fprintln(w, "Counter равен 1, task обновлен")
+		fmt.Fprintln(w, "Task обновлен")
 	} else {
 		http.Error(w, "Поддерживается только метод POST", http.StatusBadRequest)
 	}
