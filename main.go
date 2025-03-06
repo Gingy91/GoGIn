@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 )
 
@@ -13,11 +14,8 @@ type TaskRequest struct {
 }
 
 func GetHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		fmt.Fprintln(w, "Hello", task)
-	} else {
-		fmt.Fprintln(w, "Поддерживается только метод GET")
-	}
+	fmt.Fprintln(w, "Hello", task)
+
 }
 
 func PostHandler(w http.ResponseWriter, r *http.Request) {
@@ -35,9 +33,11 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func main() {
-	http.HandleFunc("/get", GetHandler)
-	http.HandleFunc("/post", PostHandler)
+	InitDB()
+	DB.AutoMigrate(&Task{})
+	router := mux.NewRouter()
+	router.HandleFunc("/api/tasks", PostHandler).Methods("POST")
+	router.HandleFunc("/api/tasks", GetHandler).Methods("GET")
 
-	http.ListenAndServe("localhost:8080", nil)
-
+	http.ListenAndServe(":8080", router)
 }
