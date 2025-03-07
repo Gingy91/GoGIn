@@ -38,6 +38,5 @@ func main() {
 	router.HandleFunc("/api/tasks", PostHandler).Methods("POST")
 	router.HandleFunc("/api/tasks", GetHandler).Methods("GET")
 
-	fmt.Println("Сервер запущен на http://localhost:8080")
 	http.ListenAndServe(":8080", router)
 }
