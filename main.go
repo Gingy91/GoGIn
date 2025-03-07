@@ -25,7 +25,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 
 	}
-	task := Task{Task: req.Task, IsDone: req.isDone}
+	task := Task{Task: req.Task, IsDone: req.IsDone}
 	DB.Create(&task)
 	fmt.Fprintln(w, "Task обновлен")
 
