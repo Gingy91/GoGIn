@@ -7,37 +7,37 @@ import (
 	"net/http"
 )
 
-var task string
-
 type TaskRequest struct {
-	Task string `json:"task"`
+	Task   string `json:"task"`
+	IsDone bool   `json:"isDone"`
 }
 
 func GetHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello", task)
-
+	var tasks []Task
+	DB.Find(&tasks)
+	json.NewEncoder(w).Encode(tasks)
 }
 
 func PostHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		var req TaskRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Ошибка JSON", http.StatusBadRequest)
-			return
+	var req TaskRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Ошибка JSON", http.StatusBadRequest)
+		return
 
-		}
-		task = req.Task
-		fmt.Fprintln(w, "Task обновлен")
-	} else {
-		http.Error(w, "Поддерживается только метод POST", http.StatusBadRequest)
 	}
+	task := Task{Task: req.Task, IsDone: req.isDone}
+	DB.Create(&task)
+	fmt.Fprintln(w, "Task обновлен")
+
 }
 func main() {
 	InitDB()
 	DB.AutoMigrate(&Task{})
+
 	router := mux.NewRouter()
 	router.HandleFunc("/api/tasks", PostHandler).Methods("POST")
 	router.HandleFunc("/api/tasks", GetHandler).Methods("GET")
 
+	fmt.Println("Сервер запущен на http://localhost:8080")
 	http.ListenAndServe(":8080", router)
 }
